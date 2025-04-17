@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	mux "github.com/gorilla/mux"
 )
@@ -48,6 +49,13 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 func deleteMovie(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
+
+	intid, err := strconv.Atoi(params["id"])
+	fmt.Println("converted into int", intid)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
 	for index, movie := range movies {
 		if movie.ID == params["id"] {
 			movies = append(movies[:index], movies[index+1:]...)
