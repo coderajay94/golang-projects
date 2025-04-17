@@ -58,6 +58,17 @@ func deleteMovie(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(Response{Status: "Failure", Description: "Item not found."})
 }
 
+func createMovie(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var movie Movie
+	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+		json.NewEncoder(w).Encode(Response{Status: "Failure", Description: "Invalid request payload."})
+		return
+	}
+	movies = append(movies, movie)
+	json.NewEncoder(w).Encode(Response{Status: "Success", Description: "Movie Created Successfully."})
+}
+
 func gethealth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(Response{Status: "Up & Running..."})
@@ -77,6 +88,8 @@ func main() {
 	r.HandleFunc("/movie/{id}", getMovie).Methods("GET")
 	r.HandleFunc("/movie/{id}", deleteMovie).Methods("DELETE")
 	r.HandleFunc("/health", gethealth).Methods("GET")
+	r.HandleFunc("/movies", createMovie).Methods("POST")
+	r.HandleFunc("movie/{id}", updateMovie).Methods("PUT")
 	fmt.Println("Server started at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
