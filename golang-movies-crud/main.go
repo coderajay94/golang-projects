@@ -65,8 +65,33 @@ func createMovie(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(Response{Status: "Failure", Description: "Invalid request payload."})
 		return
 	}
+	for _, m := range movies {
+		if m.ID == movie.ID {
+			json.NewEncoder(w).Encode(Response{Status: "Failure", Description: "Movie already exists."})
+			return
+		}
+	}
 	movies = append(movies, movie)
 	json.NewEncoder(w).Encode(Response{Status: "Success", Description: "Movie Created Successfully."})
+}
+
+func updateMovie(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
+	var movie Movie
+
+	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+		json.NewEncoder(w).Encode(Response{Status: "Failure", Description: "Invalid request payload."})
+		return
+	}
+	for index, movie := range movies {
+		if movie.ID == params["id"] {
+			movies = append(movies[:index], movies[index+1:]...)
+		}
+	}
+	movie.ID = params["id"]
+	movies = append(movies, movie)
+	json.NewEncoder(w).Encode(Response{Status: "Success", Description: "Movie Updated Successfully."})
 }
 
 func gethealth(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +104,7 @@ func main() {
 	movies = append(movies, Movie{Title: "Matrix", ID: "1", ISBN: "438383", Director: &Director{FirstName: "John", LastName: "Doe"}})
 	movies = append(movies, Movie{Title: "Titanic", ID: "2", ISBN: "438663", Director: &Director{FirstName: "Ajay", LastName: "Kumar"}})
 	movies = append(movies, Movie{Title: "Titans", ID: "5", ISBN: "438783", Director: &Director{FirstName: "Lwa", LastName: "sue"}})
-	movies = append(movies, Movie{Title: "Titanic", ID: "2", ISBN: "438683", Director: &Director{FirstName: "Ajay", LastName: "Kumar"}})
+	movies = append(movies, Movie{Title: "gloabi", ID: "3", ISBN: "438683", Director: &Director{FirstName: "Ajay", LastName: "Kumar"}})
 	movies = append(movies, Movie{Title: "Honda", ID: "4", ISBN: "446683", Director: &Director{FirstName: "lou", LastName: "Nar"}})
 
 	fmt.Println("Hello, World!")
@@ -89,7 +114,7 @@ func main() {
 	r.HandleFunc("/movie/{id}", deleteMovie).Methods("DELETE")
 	r.HandleFunc("/health", gethealth).Methods("GET")
 	r.HandleFunc("/movies", createMovie).Methods("POST")
-	r.HandleFunc("movie/{id}", updateMovie).Methods("PUT")
+	r.HandleFunc("/movie/{id}", updateMovie).Methods("PUT")
 	fmt.Println("Server started at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
