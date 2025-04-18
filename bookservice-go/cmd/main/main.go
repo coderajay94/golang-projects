@@ -5,12 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/coderajay94/bookservice-go/model"
 	"github.com/coderajay94/bookservice-go/routes"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 
+	model.Init()
 	r := mux.NewRouter()
 	routes.RegisterBookRoutes(r)
 	r.Handle("/", r)
