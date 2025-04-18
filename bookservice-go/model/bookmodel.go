@@ -12,7 +12,7 @@ var db *gorm.DB
 
 type Book struct {
 	*gorm.Model
-	ID     int64  `json:"id"`
+	ID     int64  `json:"ID" gorm:"primaryKey"`
 	Title  string `json:"title"`
 	Author string `json:"author"`
 	ISBN   string `json:"isbn"`
@@ -28,10 +28,16 @@ func Init() {
 // this is different in writting in v2 of gorm
 func (b *Book) CreateBook() error {
 	if db == nil {
+		log.Println("❌ DB connection is nil!")
 		return fmt.Errorf("DB connection is nil")
 	}
 	result := db.Create(&b)
-	return result.Error
+	if result.Error != nil {
+		log.Println("❌ Error creating book:", result.Error)
+		return result.Error
+	}
+	log.Println("✅ Book created successfully:", b)
+	return nil
 }
 
 func GetAllBooks() ([]Book, error) {

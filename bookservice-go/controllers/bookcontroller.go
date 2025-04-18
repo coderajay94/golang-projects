@@ -15,8 +15,30 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to retrieve books", http.StatusInternalServerError)
 		return
 	}
+
+	// Set the response header to JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(books)
+	w.WriteHeader(http.StatusOK)
+
+	// Marshal and send the response as JSON
+	if err := json.NewEncoder(w).Encode(books); err != nil {
+		http.Error(w, "Failed to encode books", http.StatusInternalServerError)
+	}
+}
+
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	idStr := params["id"]
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+
+	if err := model.DeleteBook(id); err != nil {
+		http.Error(w, "Failed to delete book", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode("Book deleted successfully")
+	w.WriteHeader(http.StatusOK)
+
 }
 
 func GetBookByID(w http.ResponseWriter, r *http.Request) {
@@ -80,19 +102,19 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updatedBook)
 }
 
-func DeleteBook(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	idStr := params["id"]
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		http.Error(w, "Invalid book ID", http.StatusBadRequest)
-		return
-	}
+// func DeleteBook(w http.ResponseWriter, r *http.Request) {
+// 	params := mux.Vars(r)
+// 	idStr := params["id"]
+// 	id, err := strconv.ParseInt(idStr, 10, 64)
+// 	if err != nil {
+// 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
+// 		return
+// 	}
 
-	if err := model.DeleteBook(id); err != nil {
-		http.Error(w, "Failed to delete book", http.StatusInternalServerError)
-		return
-	}
+// 	if err := model.DeleteBook(id); err != nil {
+// 		http.Error(w, "Failed to delete book", http.StatusInternalServerError)
+// 		return
+// 	}
 
-	w.WriteHeader(http.StatusNoContent)
-}
+// 	w.WriteHeader(http.StatusNoContent)
+// }
