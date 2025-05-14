@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SSE Demo</title>
+  </head>
+  <body>
+    <h1>Server-Sent Events Stream</h1>
+    <pre id="output"></pre>
+
+    <script>
+      const output = document.getElementById("output");
+      const source = new EventSource("/events");
+
+      source.onmessage = function (event) {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Received data:", data); // For debugging
+
+          // Use correct keys: id, message, time
+          output.textContent += `[${data.time}] ${data.message}\n`;
+        } catch (err) {
+          output.textContent += "Error parsing data\n";
+          console.error("Parsing error:", err);
+        }
+      };
+
+      source.onerror = function () {
+        output.textContent += "Connection error...\n";
+        source.close();
+      };
+    </script>
+  </body>
+</html>
