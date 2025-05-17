@@ -14,7 +14,7 @@ func main() {
 	//fmt.Println(CeilBinarySearch(nums, target))
 }
 
-//return the index of the target of the largest of smaller than target
+//return the index of the target of the largest smaller than target
 func FloorBinarySearch(nums []int, target int) int {
 	start, end := 0, len(nums)-1
 

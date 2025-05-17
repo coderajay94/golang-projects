@@ -8,7 +8,7 @@ func main() {
 	// find the smallest of greater than target
 
 	nums := []int{1, 3, 6, 7, 12, 16, 23, 59}
-	target := 15
+	target := 60
 
 	fmt.Println(CeilingBinarySearch(nums, target))
 }
